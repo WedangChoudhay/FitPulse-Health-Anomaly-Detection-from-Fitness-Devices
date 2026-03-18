@@ -1,0 +1,36 @@
+streamlit
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+tsfresh
+prophet
+scikit-learn
+scipy
+
+🔍 Why each is required 
+📊 Core
+streamlit → UI
+pandas → data handling
+numpy → used internally by pandas, sklearn, tsfresh
+
+📈 Visualization
+matplotlib
+seaborn
+plotly
+
+🧬 ML / Time Series
+tsfresh → feature extraction
+prophet → forecasting
+
+🧠 ML Models
+scikit-learn →
+ StandardScaler
+ KMeans
+ DBSCAN
+ PCA
+ TSNE
+
+⚙️ Dependency
+scipy → required by tsfresh & sklearn
