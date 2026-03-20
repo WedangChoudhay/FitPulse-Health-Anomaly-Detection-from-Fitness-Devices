@@ -1,10 +1,10 @@
 import streamlit as st
 import plotly.express as px
-from theme import theme_sidebar, apply_theme 
-st.set_page_config(layout="wide")
+# from theme import theme_sidebar, apply_theme 
+# st.set_page_config(layout="wide")
 
-theme_sidebar()   # Show switch at top
-apply_theme() 
+# theme_sidebar()   # Show switch at top
+# apply_theme() 
 
 st.header("🔍 Null Value Analysis")
 

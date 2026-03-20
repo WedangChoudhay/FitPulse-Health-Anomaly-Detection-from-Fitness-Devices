@@ -1,11 +1,11 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from theme import theme_sidebar, apply_theme 
-st.set_page_config(layout="wide")
+# from theme import theme_sidebar, apply_theme 
+# st.set_page_config(layout="wide")
 
-theme_sidebar()   # Show switch at top
-apply_theme()     # Apply theme
+# theme_sidebar()   # Show switch at top
+# apply_theme()     # Apply theme
 st.title("Step 3 • Preprocess Data")
 
 if "df" not in st.session_state:

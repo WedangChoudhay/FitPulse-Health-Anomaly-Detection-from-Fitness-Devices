@@ -1,9 +1,9 @@
 import streamlit as st
-from theme import theme_sidebar, apply_theme 
-st.set_page_config(layout="wide")
+# from theme import theme_sidebar, apply_theme 
+# st.set_page_config(layout="wide")
 
-theme_sidebar()   # Show switch at top
-apply_theme()     # Apply theme
+# theme_sidebar()   # Show switch at top
+# apply_theme()     # Apply theme
 
 st.title("Step 4 • Preview Cleaned Dataset")
 
