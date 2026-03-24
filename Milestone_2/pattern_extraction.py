@@ -275,7 +275,26 @@ def run():
     background: linear-gradient(180deg,#071426,#0f2a44);
     padding:25px 15px;
     }
+    /* Safe Spacing */
+    section[data-testid="stSidebar"] .block-container {
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+    /* ADD HERE */
+    section[data-testid="stSidebar"] * {
+        pointer-events: auto !important;
+    }
 
+    div[role="radiogroup"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    div[role="radiogroup"] label {
+        cursor: pointer !important;
+    }
+              
     /* Sidebar title */
     .sidebar-title{
     font-size:28px;
@@ -394,7 +413,8 @@ def run():
     padding:20px;
     border-radius:16px;
     border:1px solid #2a4d73;
-    margin-top:10px;
+    margin-top: 0px;
+    margin-bottom: 10px;           
     box-shadow:0 8px 20px rgba(0,0,0,0.35);
     }
 
@@ -525,7 +545,7 @@ def run():
     st.sidebar.markdown("### 📌 Navigation")
 
     section = st.sidebar.radio(
-        "",
+        "Navigation",
         [
             "📂 Data Upload",
             "🔍 Data Analysis",
@@ -606,7 +626,18 @@ def run():
     if "loaded" in st.session_state:
         st.sidebar.success("✅ Data Loaded Successfully")
     else:
-        st.sidebar.warning("⚠ Waiting for dataset files")
+        st.sidebar.markdown("""
+        <div style="
+            background:#1f3d2b;
+            padding:12px;
+            border-radius:10px;
+            border:1px solid #2a4d73;
+            color:#facc15;
+            margin-top:5px;
+        ">
+        ⚠ Waiting for dataset files
+        </div>
+        """, unsafe_allow_html=True)
 
     # --------------------------
     # USER FILTER

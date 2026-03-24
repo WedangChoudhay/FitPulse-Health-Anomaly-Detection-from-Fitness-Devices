@@ -77,3 +77,12 @@ Screenshots of outputs are available in the `screenshots/` folder.
 ### 1️⃣ Clone the repository
 ```bash
 git clone https://github.com/WedangChoudhay/FitPulse-Health-Anomaly-Detection-from-Fitness-Devices.git
+
+2️⃣ Create Virtual Environment
+python -m venv fitpulse
+
+3️⃣ Activate Environment
+fitpulse\Scripts\activate
+
+5️⃣ Run the Application
+streamlit run main_app.py
