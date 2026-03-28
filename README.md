@@ -1,88 +1,193 @@
 # 🧠 FitPulse: Health Anomaly Detection from Fitness Devices
 
-## 📌 Project Overview
-FitPulse is a data analytics and machine learning project that analyzes fitness tracker data to detect anomalies in health patterns.
+<p align="center">
+  🚀 Data Analytics • 🤖 Machine Learning • 📊 Interactive Dashboard  
+</p>
 
-The system processes real-world fitness data such as heart rate, steps, sleep, and activity levels to provide meaningful insights using advanced techniques.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python">
+  <img src="https://img.shields.io/badge/Streamlit-App-red?style=for-the-badge&logo=streamlit">
+  <img src="https://img.shields.io/badge/Machine%20Learning-ScikitLearn-orange?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Data%20Visualization-Plotly-blueviolet?style=for-the-badge">
+</p>
+
+---
+
+## 📌 Project Overview
+
+FitPulse is an end-to-end **health analytics system** that processes wearable fitness data to detect anomalies and provide actionable insights.
+
+It uses **machine learning, time-series analysis, and interactive dashboards** to identify abnormal health patterns efficiently.
 
 ---
 
 ## 🎯 Objectives
-- Analyze fitness data efficiently
-- Detect anomalies in health patterns
-- Perform time-series forecasting
-- Apply clustering for behavioral analysis
-- Visualize trends and patterns
+
+* 📊 Analyze fitness data efficiently
+* ⚠ Detect anomalies in health patterns
+* 📈 Perform time-series forecasting
+* 🧠 Apply clustering for behavior analysis
+* 🖥 Build an interactive dashboard
 
 ---
 
-## 🧩 Project Structure
+## 🧩 Project Pipeline
 
-### 🔹 Milestone 1
-- Data Upload & Cleaning
-- Null Value Handling
-- Preprocessing
-- Exploratory Data Analysis (EDA)
-- Basic Modeling
-
-### 🔹 Milestone 2
-- Feature Extraction using **TSFresh**
-- Time Series Forecasting using **Prophet**
-- Clustering using:
-  - KMeans
-  - DBSCAN
-- Dimensionality Reduction:
-  - PCA
-  - t-SNE
-- Advanced Visualizations
+```mermaid
+graph TD
+A[Data Upload] --> B[Preprocessing]
+B --> C[EDA]
+C --> D[Feature Extraction]
+D --> E[Clustering & Forecasting]
+E --> F[Anomaly Detection]
+F --> G[Dashboard Insights]
+```
 
 ---
 
-## 📊 Technologies Used
-- Python
-- Streamlit
-- Pandas, NumPy
-- Matplotlib, Seaborn, Plotly
-- Scikit-learn
-- TSFresh
-- Facebook Prophet
+## 🏗 Project Structure
+
+### 🔹 Milestone 1: Data Processing & EDA
+
+* Data Upload
+* Null Value Handling
+* Preprocessing
+* Data Preview
+* Exploratory Data Analysis (EDA)
+* Trend Visualization
+
+---
+
+### 🔹 Milestone 2: Advanced Analytics
+
+* Feature Extraction (**TSFresh**)
+* Forecasting (**Prophet**)
+* Clustering:
+
+  * KMeans
+  * DBSCAN
+* Dimensionality Reduction:
+
+  * PCA
+  * t-SNE
+
+---
+
+### 🔹 Milestone 3: Anomaly Detection
+
+* Model Residual Analysis
+* Threshold-based Detection
+* Cluster-based Outliers
+* Visualization with highlighted anomalies
+
+---
+
+### 🔹 Milestone 4: Interactive Dashboard
+
+* 📊 Streamlit-based UI
+* 📅 Date & range filters (7/30 days)
+* 📈 Dynamic charts
+* 🤖 AI anomaly detection (Isolation Forest)
+* 📤 Export results (CSV)
+
+---
+
+## 📊 Tech Stack
+
+| Category            | Tools              |
+| ------------------- | ------------------ |
+| Language            | Python             |
+| UI                  | Streamlit          |
+| Data Processing     | Pandas, NumPy      |
+| Visualization       | Plotly, Matplotlib |
+| ML                  | Scikit-learn       |
+| Time-Series         | Prophet            |
+| Feature Engineering | TSFresh            |
 
 ---
 
 ## 📁 Dataset
-The dataset includes:
-- Heart Rate Data
-- Daily Activity Data
-- Sleep Data
-- Steps & Intensity Data
 
----
+Includes:
 
-## 📈 Key Features
-- Interactive Dashboard using Streamlit
-- Real-time data visualization
-- Automated feature extraction
-- Predictive analytics using forecasting models
-- Clustering-based behavior analysis
+* ❤️ Heart Rate Data
+* 🚶 Daily Activity
+* 😴 Sleep Data
+* 🔥 Calories & Intensity
 
 ---
 
 ## 📸 Screenshots
-Screenshots of outputs are available in the `screenshots/` folder.
+
+> Add your screenshots inside `/screenshots` folder
+
+| Dashboard                               | Clustering                             | Anomaly Detection                   |
+| --------------------------------------- | -------------------------------------- | ----------------------------------- |
+| ![dashboard](screenshots/dashboard.png) | ![cluster](screenshots/clustering.png) | ![anomaly](screenshots/anomaly.png) |
 
 ---
 
-## 🚀 How to Run the Project
+## 🚀 Installation & Setup
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone Repository
+
 ```bash
 git clone https://github.com/WedangChoudhay/FitPulse-Health-Anomaly-Detection-from-Fitness-Devices.git
+cd FitPulse-Health-Anomaly-Detection-from-Fitness-Devices
+```
 
-2️⃣ Create Virtual Environment
+### 2️⃣ Create Virtual Environment
+
+```bash
 python -m venv fitpulse
+```
 
-3️⃣ Activate Environment
+### 3️⃣ Activate Environment
+
+```bash
 fitpulse\Scripts\activate
+```
 
-5️⃣ Run the Application
+### 4️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5️⃣ Run App
+
+```bash
 streamlit run main_app.py
+```
+
+---
+
+## 🌟 Key Features
+
+* 🔥 Interactive dashboard
+* ⚡ Real-time filtering
+* 🤖 ML-based anomaly detection
+* 📊 Advanced visualizations
+* 🔍 Behavioral clustering
+* 📈 Forecasting insights
+
+---
+
+## 💡 Future Enhancements
+
+* 📡 Real-time wearable integration
+* 📱 Mobile application
+* ☁ Cloud deployment
+* 🤖 Advanced AI anomaly detection
+
+---
+
+## ⭐ Conclusion
+
+FitPulse demonstrates how **data analytics and machine learning** can be used for **early health anomaly detection**, enabling smarter and proactive healthcare insights.
+
+---
+
+<p align="center">
+  ⭐ If you like this project, give it a star!
+</p>

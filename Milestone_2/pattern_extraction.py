@@ -800,7 +800,7 @@ def run():
                 st.rerun() # Refresh to show data
                 
 # =====================================================
-# ✅ SHOW DATA ONLY AFTER LOADED
+#  SHOW DATA ONLY AFTER LOADED
 # =====================================================
     if "loaded" in st.session_state:
         daily = st.session_state.daily
@@ -1372,6 +1372,10 @@ def run():
     if st.button("🧩 Run Clustering (K=3)"):
         st.session_state.progress = 100
         
+        st.session_state.processed_df = daily.copy()
+
+        st.success("✅ Data saved for Dashboard")
+        
         cluster_cols = [
         "TotalSteps",
         "Calories",
@@ -1439,7 +1443,7 @@ def run():
 
         fig, ax = plt.subplots(figsize=(8,5))
 
-    # Custom colors like your image
+    # Custom colors image
         colors = ["#4f9fd1", "#ff6b81", "#2ecc71"]
 
         for cluster in range(3):
@@ -1496,7 +1500,7 @@ def run():
         dbscan = DBSCAN(eps=EPS, min_samples=MIN_SAMPLES)
         dbscan_labels = dbscan.fit_predict(X_scaled)
 
-        # -------------------------
+    # -------------------------
     # CLUSTERING SUMMARY CARDS
     # -------------------------
         st.subheader("Clustering Summary")
