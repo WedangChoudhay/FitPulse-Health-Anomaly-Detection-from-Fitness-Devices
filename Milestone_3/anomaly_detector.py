@@ -1,14 +1,22 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import warnings
+warnings.filterwarnings("ignore")
+
 def run():
-    import streamlit as st
-    import pandas as pd
-    import numpy as np
-    import plotly.graph_objects as go
-    import plotly.express as px
-    from plotly.subplots import make_subplots
-    import warnings
-    warnings.filterwarnings("ignore")
-    
-        # ── Session state ─────────────────────────────────────────────────────────────
+    # ── Page config ───────────────────────────────────────────────────────────────
+    st.set_page_config(
+        page_title="FitPulse · Milestone 3",
+        page_icon="🚨",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
+
+    # ── Session state ─────────────────────────────────────────────────────────────
     for k, v in [
         ("dark_mode",        True),
         ("files_loaded",     False),
@@ -219,6 +227,32 @@ def run():
         transform:translateY(-1px);
     }}
     .m3-divider {{ border:none; border-top:1px solid {CARD_BOR}; margin:2rem 0; }}
+    /* Dropdown selected text */
+    div[data-baseweb="select"] > div {{
+        color: black !important;
+    }}
+
+    /* ✅ Dropdown options text */
+    div[data-baseweb="popover"] * {{
+        color: black !important;
+    }}
+
+    /* ✅ Selected value text */
+    div[data-baseweb="select"] span {{
+        color: black !important;
+    }}
+    /* ✅ FIX DROPDOWN BUTTON ONLY (SAFE) */
+
+    div[data-baseweb="select"] > div {{
+        background: rgba(15,23,42,0.85) !important;
+        border: 1px solid rgba(99,179,237,0.2) !important;
+        border-radius: 12px !important;
+    }}
+
+    /* ✅ Fix text properly */
+    div[data-baseweb="select"] input {{
+        color: #e2e8f0 !important;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -490,120 +524,25 @@ def run():
     # ══════════════════════════════════════════════════════════════════════════════
     # SECTION 1 — DATA LOADING
     # ══════════════════════════════════════════════════════════════════════════════
-    sec("📂", "Data Loading", "Step 1")
+    if "master" not in st.session_state:
+        st.error("⚠ Please run Milestone 2 first and load data")
+        st.stop()
+    
+    master = st.session_state["master"]
+    master["Date"] = pd.to_datetime(master["ActivityDate"]).dt.date
+    # 🚨 ENSURE REQUIRED COLUMNS EXIST
+    required_cols = ["Date", "AvgHR", "TotalSleepMinutes"]
 
-    ui_info("Upload the same 5 Fitbit CSV files as Milestone 2. Files are auto-detected by column structure.")
+    if not all(col in master.columns for col in required_cols):
+        st.error("❌ Master data is not processed. Please click LOAD in Milestone 2 again.")
+        st.stop()
+        
+    st.session_state.files_loaded = True
+    st.success("✅ Using data from Pattern Extraction")
 
-    uploaded_files = st.file_uploader(
-        "📁  Drop all 5 Fitbit CSV files here",
-        type="csv", accept_multiple_files=True, key="m3_uploader",
-        help="Hold Ctrl (Windows) or Cmd (Mac) to select multiple files"
-    )
+    st.write("Master shape:", master.shape)
 
-    detected = {}
-    ignored  = []
-    if uploaded_files:
-        raw_uploads = []
-        for uf in uploaded_files:
-            try:
-                df_tmp = pd.read_csv(uf)
-                raw_uploads.append((uf.name, df_tmp))
-            except Exception:
-                ignored.append(uf.name)
-
-        used_names = set()
-        for req_name, finfo in REQUIRED_FILES.items():
-            best_score, best_name, best_df = 0, None, None
-            for uname, udf in raw_uploads:
-                s = score_match(udf, finfo)
-                if s > best_score:
-                    best_score, best_name, best_df = s, uname, udf
-            if best_score >= 2:
-                detected[req_name] = best_df
-                used_names.add(best_name)
-
-        for uname, _ in raw_uploads:
-            if uname not in used_names:
-                ignored.append(uname)
-
-    # Status grid
-    status_html = '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;margin:1rem 0">'
-    for req_name, finfo in REQUIRED_FILES.items():
-        found = req_name in detected
-        bg  = SUCCESS_BG if found else WARN_BG
-        bor = SUCCESS_BOR if found else WARN_BOR
-        ico = "✅" if found else "❌"
-        status_html += f"""
-        <div style="background:{bg};border:1px solid {bor};border-radius:10px;padding:0.7rem 0.9rem">
-        <div style="font-size:1.2rem">{ico} {finfo['icon']}</div>
-        <div style="font-size:0.72rem;font-weight:600;color:{TEXT};margin-top:0.3rem">{finfo['label']}</div>
-        <div style="font-size:0.65rem;color:{MUTED};font-family:'JetBrains Mono',monospace;margin-top:0.1rem">
-            {'Found ✓' if found else 'Missing'}
-        </div>
-        </div>"""
-    status_html += "</div>"
-    st.markdown(status_html, unsafe_allow_html=True)
-
-    n_up = len(detected)
-    metrics((n_up, "Detected"), (5 - n_up, "Missing"), ("✓" if n_up == 5 else "✗", "Ready"))
-
-    if n_up < 5:
-        missing = [REQUIRED_FILES[r]["label"] for r in REQUIRED_FILES if r not in detected]
-        ui_warn(f"Missing: {', '.join(missing)}")
-
-    if st.button("⚡ Load & Build Master DataFrame", disabled=(n_up < 5)):
-        with st.spinner("Parsing and building master..."):
-            try:
-                daily    = detected["dailyActivity_merged.csv"].copy()
-                hourly_s = detected["hourlySteps_merged.csv"].copy()
-                hourly_i = detected["hourlyIntensities_merged.csv"].copy()
-                sleep    = detected["minuteSleep_merged.csv"].copy()
-                hr       = detected["heartrate_seconds_merged.csv"].copy()
-
-                daily["ActivityDate"]    = pd.to_datetime(daily["ActivityDate"],    format="%m/%d/%Y")
-                hourly_s["ActivityHour"] = pd.to_datetime(hourly_s["ActivityHour"], format="%m/%d/%Y %I:%M:%S %p")
-                hourly_i["ActivityHour"] = pd.to_datetime(hourly_i["ActivityHour"], format="%m/%d/%Y %I:%M:%S %p")
-                sleep["date"]            = pd.to_datetime(sleep["date"],            format="%m/%d/%Y %I:%M:%S %p")
-                hr["Time"]               = pd.to_datetime(hr["Time"],               format="%m/%d/%Y %I:%M:%S %p")
-
-                hr_minute = (hr.set_index("Time").groupby("Id")["Value"]
-                            .resample("1min").mean().reset_index())
-                hr_minute.columns = ["Id","Time","HeartRate"]
-                hr_minute = hr_minute.dropna()
-
-                hr_minute["Date"] = hr_minute["Time"].dt.date
-                hr_daily = (hr_minute.groupby(["Id","Date"])["HeartRate"]
-                            .agg(["mean","max","min","std"]).reset_index()
-                            .rename(columns={"mean":"AvgHR","max":"MaxHR","min":"MinHR","std":"StdHR"}))
-
-                sleep["Date"] = sleep["date"].dt.date
-                sleep_daily = (sleep.groupby(["Id","Date"])
-                            .agg(TotalSleepMinutes=("value","count"),
-                                    DominantSleepStage=("value", lambda x: x.mode()[0]))
-                            .reset_index())
-
-                master = daily.copy().rename(columns={"ActivityDate":"Date"})
-                master["Date"] = master["Date"].dt.date
-                master = master.merge(hr_daily,    on=["Id","Date"], how="left")
-                master = master.merge(sleep_daily, on=["Id","Date"], how="left")
-                master["TotalSleepMinutes"]  = master["TotalSleepMinutes"].fillna(0)
-                master["DominantSleepStage"] = master["DominantSleepStage"].fillna(0)
-                for col in ["AvgHR","MaxHR","MinHR","StdHR"]:
-                    master[col] = master.groupby("Id")[col].transform(lambda x: x.fillna(x.median()))
-
-                st.session_state.daily     = daily
-                st.session_state.hourly_s  = hourly_s
-                st.session_state.hourly_i  = hourly_i
-                st.session_state.sleep     = sleep
-                st.session_state.hr        = hr
-                st.session_state.hr_minute = hr_minute
-                st.session_state.master    = master
-                st.session_state.files_loaded = True
-                st.rerun()
-            except Exception as e:
-                st.error(f"Error: {e}")
-
-    if st.session_state.files_loaded:
+    if "master" in st.session_state:
         master = st.session_state.master
         ui_success(f"Master DataFrame ready — {master.shape[0]} rows · {master['Id'].nunique()} users")
 
@@ -1166,7 +1105,6 @@ def run():
                 """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
-            
             # st.markdown(f"""
             # <div class="card" style="border-color:{DANGER_BOR}">
             # <div class="card-title">📸 Screenshots Required for Submission</div>

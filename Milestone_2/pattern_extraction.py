@@ -623,7 +623,7 @@ def run():
     # --------------------------
     # DATA STATUS
     # --------------------------
-    if "loaded" in st.session_state:
+    if st.session_state.get("loaded"):
         st.sidebar.success("✅ Data Loaded Successfully")
     else:
         st.sidebar.markdown("""
@@ -644,7 +644,7 @@ def run():
     # --------------------------
     st.sidebar.markdown("### 🎛 Controls")
 
-    if "loaded" in st.session_state:
+    if st.session_state.get("loaded"):
         user_options = ["All"] + list(st.session_state.daily["Id"].unique())
     else:
         user_options = ["All"]
@@ -653,7 +653,7 @@ def run():
     # --------------------------
     # QUICK STATS
     # --------------------------
-    if "loaded" in st.session_state:
+    if st.session_state.get("loaded"):
         st.sidebar.markdown("### 📊 Quick Stats")
         st.sidebar.metric("Users", st.session_state.daily["Id"].nunique())
         st.sidebar.metric("Rows", len(st.session_state.daily))
@@ -738,6 +738,9 @@ def run():
             elif "time" in cols and "value" in cols:
                 datasets["Heart Rate"] = file
 
+        # ✅ ADD EXACTLY HERE (END OF if uploaded_files BLOCK)
+        st.session_state["datasets"] = datasets
+        st.session_state["uploaded_files"] = uploaded_files
 
     # ------------------------------------------------
     # STATUS CARDS
@@ -792,17 +795,54 @@ def run():
                 st.session_state.steps = pd.read_csv(datasets["Hourly Steps"])
                 st.session_state.sleep = pd.read_csv(datasets["Minute Sleep"])
                 st.session_state.hr = pd.read_csv(datasets["Heart Rate"])
-        
-                st.session_state.loaded = True
                 st.session_state.progress = 50
 
-                st.success("✅ All datasets loaded successfully!")
-                st.rerun() # Refresh to show data
+            # ✅ CREATE MASTER DATAFRAME (ADD THIS)
+            daily = st.session_state.daily.copy()
+            steps = st.session_state.steps.copy()
+            sleep = st.session_state.sleep.copy()
+            hr = st.session_state.hr.copy()
+
+            # Convert dates
+            daily["ActivityDate"] = pd.to_datetime(daily["ActivityDate"])
+            steps["ActivityHour"] = pd.to_datetime(steps["ActivityHour"])
+            sleep["date"] = pd.to_datetime(sleep["date"])
+            hr["Time"] = pd.to_datetime(hr["Time"])
+
+            # Aggregate steps (daily)
+            steps_daily = steps.groupby(["Id", steps["ActivityHour"].dt.date])["StepTotal"].sum().reset_index()
+            steps_daily.rename(columns={"ActivityHour": "Date"}, inplace=True)
+
+            # Aggregate sleep (daily)
+            sleep_daily = sleep.groupby(["Id", sleep["date"].dt.date])["value"].sum().reset_index()
+            sleep_daily.rename(columns={"date": "Date", "value": "TotalSleepMinutes"}, inplace=True)
+
+            # Aggregate HR (daily)
+            hr_daily = hr.groupby(["Id", hr["Time"].dt.date])["Value"].agg(["mean","max","min"]).reset_index()
+            hr_daily.columns = ["Id","Date","AvgHR","MaxHR","MinHR"]
+
+            # Merge all
+            master = daily.copy()
+            master["Date"] = master["ActivityDate"].dt.date
+
+            master = master.merge(steps_daily, on=["Id","Date"], how="left")
+            master = master.merge(sleep_daily, on=["Id","Date"], how="left")
+            master = master.merge(hr_daily, on=["Id","Date"], how="left")
+
+            # ✅ STORE MASTER (MOST IMPORTANT)
+            st.session_state["master"] = master
+            # added
+            st.write("M2 Shape:", master.shape)
+            st.write("M2 Columns:", master.columns)
+            st.dataframe(master.head())
+            st.session_state["loaded"] = True
+            st.success("✅ All datasets loaded successfully!")
+            st.rerun() # Refresh to show data
                 
 # =====================================================
 #  SHOW DATA ONLY AFTER LOADED
 # =====================================================
-    if "loaded" in st.session_state:
+    if st.session_state.get("loaded"):
         daily = st.session_state.daily
         steps = st.session_state.steps
         sleep = st.session_state.sleep
@@ -826,7 +866,7 @@ def run():
     # ------------------------------------------------
     # DATA PREVIEW
     # ------------------------------------------------
-    if "loaded" in st.session_state:
+    if st.session_state.get("loaded"):
 
         daily = st.session_state.daily.copy()
         steps = st.session_state.steps.copy()
@@ -847,7 +887,7 @@ def run():
     # ------------------------------------------------
     # NULL CHECK
     # ------------------------------------------------
-    if "loaded" in st.session_state:
+    if st.session_state.get("loaded"):
         st.subheader("🔹 Step 2 • Null Value Check")
 
         c1,c2,c3,c4 = st.columns(4)
@@ -1370,9 +1410,13 @@ def run():
     )
 
     if st.button("🧩 Run Clustering (K=3)"):
+        import numpy as np
+        np.random.seed(42)
         st.session_state.progress = 100
         
         st.session_state.processed_df = daily.copy()
+        daily = st.session_state.daily.copy()
+
 
         st.success("✅ Data saved for Dashboard")
         
@@ -1384,7 +1428,7 @@ def run():
         ]
 
     # Select features
-        X = daily[cluster_cols].copy()
+        X = st.session_state.daily[cluster_cols].copy()
 
     # Remove missing values (important for clustering)
         X = X.dropna()
